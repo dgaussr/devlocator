@@ -1,0 +1,54 @@
+import React, { useEffect, useState } from 'react';
+import api from './services/api';
+
+import './global.css';
+import './App.css';
+import './Sidebar.css';
+import './Main.css';
+
+import DevForm from './components/DevItem/DevForm/index';
+import DevItem from './components/DevItem/Index';
+
+//COMPONENTE função que retorna HTML bloco isolado que nao interfere no restante da app
+//ESTADO
+//PROP informaç~es que um componente pai(APP) passa para os filhos()
+//ESTADO Informações mantidas pelo componente (Lembrar: imutabilidade);
+
+function App() {
+  const [devs, setDevs] = useState([]);
+
+  useEffect(() => {
+    async function loadDevs() {
+      const response = await api.get('./devs');
+
+      setDevs(response.data);
+    }
+
+    loadDevs();
+  }, []);
+
+  async function handleAddDev(data) {
+    const response = await api.post('/devs', data);
+
+    setDevs([...devs, response.data]);
+  }
+
+  return (
+    <div id="app">
+      <aside>
+        <strong>Cadastrar</strong>
+        <DevForm onSubmit={handleAddDev} />
+      </aside>
+
+      <main>
+        <ul>
+          {devs.map(dev => (
+            <DevItem key={dev._id} dev={dev} />
+          ))}
+        </ul>
+      </main>
+    </div>
+  );
+}
+
+export default App;
